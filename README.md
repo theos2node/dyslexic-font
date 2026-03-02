@@ -1,6 +1,6 @@
 # Dyslexic Focus Text Lab
 
-A full-screen GitHub Pages web app for writing and reading long text with contrast-based highlight anchors.
+A full-screen GitHub Pages web app for writing and reading long text with contrast-based highlight anchors, built from my own dyslexia workflow and the font/style pattern that helps me read.
 
 Live site: <https://theos2node.github.io/dyslexic-font/>
 
