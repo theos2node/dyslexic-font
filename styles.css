@@ -1,212 +1,193 @@
 :root {
-  --paper: #f4f3ed;
-  --ink: #171717;
-  --accent: #101014;
-  --bg-0: #25312a;
-  --bg-1: #11181f;
+  --bg: #f3f5f7;
+  --panel: #ffffff;
+  --line: #d6dde4;
+  --ink: #1f2733;
+  --muted: #5f6f84;
+  --focus: #153f72;
 }
 
 * {
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
-  min-height: 100vh;
-  font-family: "Space Grotesk", system-ui, sans-serif;
-  color: var(--paper);
-  background:
-    radial-gradient(1200px 700px at 80% 10%, #3f5146 0%, transparent 50%),
-    radial-gradient(900px 500px at 10% 100%, #1d232e 0%, transparent 45%),
-    linear-gradient(140deg, var(--bg-0), var(--bg-1));
+  width: 100%;
+  height: 100%;
 }
 
-.layout {
-  width: min(1100px, 92vw);
-  margin: 4rem auto;
+body {
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+.app-shell {
+  height: 100vh;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.25rem;
+  grid-template-rows: auto 1fr;
 }
 
-.panel {
-  border: 2px solid rgba(244, 243, 237, 0.25);
-  background: rgba(14, 18, 21, 0.65);
-  backdrop-filter: blur(8px);
-  border-radius: 18px;
-  padding: 1.25rem;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+.topbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.25rem;
+  border-bottom: 1px solid var(--line);
+  background: #fff;
 }
 
 .kicker {
   margin: 0;
   font-size: 0.75rem;
-  text-transform: uppercase;
   letter-spacing: 0.08em;
-  opacity: 0.75;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 h1 {
-  margin: 0.4rem 0 0.8rem;
-  font-size: clamp(1.4rem, 3vw, 2.1rem);
+  margin: 0.2rem 0;
+  font-size: 1.5rem;
 }
 
-.lead {
-  margin: 0 0 1rem;
-  line-height: 1.5;
-  opacity: 0.95;
+.subtitle {
+  margin: 0;
+  color: var(--muted);
 }
 
-code {
-  font-family: "Space Grotesk", monospace;
-  font-size: 0.9em;
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
-label {
-  display: block;
+.control {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+select,
+button {
+  font: inherit;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+}
+
+select {
+  padding: 0.42rem 0.6rem;
+}
+
+button {
+  padding: 0.45rem 0.75rem;
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: #bfcad6;
+}
+
+.workspace {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(340px, 1fr) minmax(340px, 1fr);
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.panel {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0.9rem;
+  border-bottom: 1px solid var(--line);
+}
+
+h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.stats {
+  margin: 0;
   font-size: 0.9rem;
-  margin-bottom: 0.4rem;
+  color: var(--muted);
 }
 
 textarea {
   width: 100%;
-  border-radius: 10px;
-  border: 1px solid rgba(244, 243, 237, 0.32);
-  background: rgba(0, 0, 0, 0.26);
-  color: var(--paper);
-  padding: 0.8rem;
-  font-family: "Space Grotesk", system-ui, sans-serif;
-  font-size: 1rem;
-  resize: vertical;
+  height: 100%;
+  border: 0;
+  padding: 1rem;
+  resize: none;
+  font: 500 1.07rem/1.6 "Source Sans 3", system-ui, sans-serif;
+  color: #1f2733;
+  background: transparent;
 }
 
-.controls-row {
-  margin-top: 0.8rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.8rem;
+textarea:focus,
+select:focus,
+button:focus {
+  outline: 2px solid #97b4d6;
+  outline-offset: 1px;
 }
 
-.checkbox {
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.preview-surface {
+  min-height: 0;
+  overflow: auto;
+  padding: 1rem;
+  background: #fff;
 }
 
-button {
-  font: inherit;
-  color: var(--paper);
-  background: #0e0f12;
-  border: 1px solid rgba(244, 243, 237, 0.35);
-  border-radius: 8px;
-  padding: 0.5rem 0.8rem;
-  cursor: pointer;
-}
-
-select {
-  font: inherit;
-  color: var(--paper);
-  background: #0e0f12;
-  border: 1px solid rgba(244, 243, 237, 0.35);
-  border-radius: 8px;
-  padding: 0.42rem 0.6rem;
-}
-
-.compact-control {
-  margin: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-}
-
-button:hover {
-  background: #1a1d22;
-}
-
-.stage {
-  margin-top: 0.8rem;
-  padding: 2rem 1rem;
-  border-radius: 14px;
-  background:
-    linear-gradient(160deg, rgba(17, 21, 24, 0.8), rgba(9, 12, 14, 0.9)),
-    repeating-linear-gradient(
-      115deg,
-      rgba(255, 255, 255, 0.03),
-      rgba(255, 255, 255, 0.03) 2px,
-      transparent 2px,
-      transparent 8px
-    );
-}
-
-.nameplate-shell {
-  transform: rotate(-8deg);
-  display: inline-block;
-}
-
-.nameplate {
-  position: relative;
-  display: inline-block;
-  max-width: min(100%, 650px);
-  padding: 0.35em 0.55em 0.38em;
-  border: 10px solid #22282e;
-  background: #f3f2ec;
-  color: var(--ink);
-  font-family: "Cormorant Garamond", Georgia, serif;
-  font-weight: 700;
-  font-size: clamp(1.35rem, 2.5vw, 2.5rem);
-  line-height: 1.03;
-  letter-spacing: 0.012em;
+.preview-text {
+  max-width: 75ch;
+  font: 700 1.24rem/1.65 "Merriweather", Georgia, serif;
+  color: #101417;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
-.nameplate::after {
-  content: "";
-  position: absolute;
-  left: 60px;
-  bottom: -42px;
-  width: 0;
-  height: 0;
-  border-left: 28px solid transparent;
-  border-right: 28px solid transparent;
-  border-top: 42px solid #f3f2ec;
-  filter: drop-shadow(-7px -6px 0 #22282e);
-}
-
 .char {
-  display: inline-block;
   white-space: pre;
 }
 
 .char.inverse {
-  background: #171717;
-  color: #f4f3ed;
-  padding: 0 0.07em;
-  border-radius: 1px;
+  display: inline;
+  padding: 0 0.12em;
+  border-radius: 2px;
+  background: #111111;
+  color: #f8f8f8;
 }
 
-.note {
-  margin-top: 1rem;
-  font-size: 0.9rem;
-  opacity: 0.78;
-}
+@media (max-width: 980px) {
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 
-@media (max-width: 920px) {
-  .layout {
-    margin: 1.2rem auto 2rem;
+  .workspace {
     grid-template-columns: 1fr;
   }
 
-  .nameplate {
-    font-size: clamp(1.7rem, 10vw, 2.5rem);
-  }
-
-  .nameplate::after {
-    left: 44px;
-    border-left-width: 22px;
-    border-right-width: 22px;
+  .preview-text {
+    max-width: none;
   }
 }

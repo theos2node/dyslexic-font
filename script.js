@@ -3,6 +3,7 @@ const lockToTitleCase = document.getElementById("lockToTitleCase");
 const modeSelect = document.getElementById("modeSelect");
 const output = document.getElementById("nameplateOutput");
 const copyBtn = document.getElementById("copyBtn");
+const editorStats = document.getElementById("editorStats");
 
 const WORD_CHAR = /[\p{L}\p{N}]/u;
 const LETTER = /\p{L}/u;
@@ -186,29 +187,18 @@ function syllableStarts(chars) {
   return [...new Set(starts)].filter((start) => start >= 0);
 }
 
-function pickSyllableBoundaryAnchor(chars) {
+function pickSyllableBoundaryAnchors(chars) {
   const starts = syllableStarts(chars).filter((start) => start > 0);
   if (starts.length === 0) {
-    return -1;
+    return [];
   }
 
-  if (starts.length === 1) {
-    return starts[0];
+  // For longer words, highlight multiple syllable starts.
+  if (chars.length >= 10 || starts.length >= 2) {
+    return starts;
   }
 
-  const target = Math.round(chars.length * 0.58);
-  let best = starts[0];
-  let bestScore = Math.abs(best - target);
-
-  for (let i = 1; i < starts.length; i += 1) {
-    const score = Math.abs(starts[i] - target);
-    if (score < bestScore) {
-      best = starts[i];
-      bestScore = score;
-    }
-  }
-
-  return best;
+  return [starts[0]];
 }
 
 function pickAdaptivePrimary(chars) {
@@ -276,10 +266,7 @@ function anchorsForWord(word, mode) {
   }
 
   if (mode === "syllable") {
-    const boundary = pickSyllableBoundaryAnchor(chars);
-    if (boundary >= 0) {
-      anchors.add(boundary);
-    }
+    pickSyllableBoundaryAnchors(chars).forEach((idx) => anchors.add(idx));
     return anchors;
   }
 
@@ -322,14 +309,15 @@ function collectInvertedIndexes(text, mode) {
   return { chars, inverted };
 }
 
+function updateStats(text) {
+  const words = text.match(/[\p{L}\p{N}]+/gu) ?? [];
+  editorStats.textContent = `${words.length} words | ${text.length} characters`;
+}
+
 function renderNameplate() {
   let text = inputText.value;
   if (lockToTitleCase.checked) {
     text = toTitleCase(text);
-  }
-
-  if (!text.trim()) {
-    text = "Gentle-Looking Mother";
   }
 
   const selectedMode = modeSelect.value;
@@ -349,6 +337,8 @@ function renderNameplate() {
     span.textContent = char;
     output.appendChild(span);
   });
+
+  updateStats(text);
 }
 
 inputText.addEventListener("input", renderNameplate);

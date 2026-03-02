@@ -1,55 +1,50 @@
-# dyslexic-font
+# Dyslexic Focus Text Lab
 
-A lightweight GitHub Pages app that recreates the Persona-style speaker tag effect from your screenshot:
+A full-screen GitHub Pages web app for writing and reading long text with contrast-based highlight anchors.
 
-- White nameplate with bold black border.
-- Serif text.
-- Black-background/white-text letter blocks.
-- Three modes:
-  - `Syllable Change`: highlights one detected syllable-boundary letter per word.
-  - `Classic`: first letter after segment boundaries.
-  - `Adaptive`: heuristic anchors for easier scanning.
+Live site: <https://theos2node.github.io/dyslexic-font/>
 
-## What was implemented
+## Overview
 
-- `index.html`: input + live preview UI.
-- `styles.css`: nameplate visual treatment and responsive layout.
-- `script.js`: text transform and rendering logic.
+This project provides a large writing area and a live rendered preview. The preview emphasizes selected letters using high-contrast blocks (`white text on black background`) to improve scanning.
 
-## Placement rules
+## Features
 
-`Classic` mode:
+- Full-screen, two-pane workspace (`Input` + `Preview`)
+- Unlimited paragraph input
+- Live rendering while typing
+- Word and character counters
+- Copy plain text button
+- Responsive layout for desktop and mobile
 
-1. Invert the first letter at string start.
-2. Invert the first letter after a space.
-3. Invert the first letter after `-`.
+## Highlight Modes
 
-This matches your provided screenshot behavior (`Gentle-Looking Mother` -> `G`, `L`, `M`).
+1. `Syllable Change` (default)
+- Uses approximate syllable boundaries derived from vowel groups and consonant clusters.
+- Highlights syllable-transition letters.
+- For longer words, highlights multiple transitions.
 
-`Syllable Change` mode:
+2. `Adaptive`
+- Uses visual-anchor heuristics tuned for quick scanning.
+- Usually one anchor, sometimes two in longer words.
 
-1. Splits words into approximate syllables from vowel groups and consonant clusters.
-2. Selects one syllable-transition start as the highlight anchor.
-3. Example target behavior: `TheoDore`.
+3. `Classic`
+- Highlights the first letter of each word segment.
 
-`Adaptive` mode:
+## Tech
 
-1. Uses classic segment starts as baseline.
-2. For digraph-led words (`sh`, `ch`, `th`, etc.), anchors can shift to the first vowel after the digraph.
-3. For longer words, adds a second anchor around the middle-right of the word (consonant-biased).
+- Plain HTML, CSS, and JavaScript
+- No build tooling required
+- Ready for GitHub Pages from `main` branch root
 
-## Research notes
+## Local Development
 
-This repo uses the high-contrast segment-initial inversion because it mirrors the game UI style and your observed readability benefit, while avoiding unsupported claims that it is universally better for all dyslexic readers.
+Open `index.html` directly, or run any static server in the repo root.
 
-Sources:
+Example:
 
-1. Persona UI design note about using reverse-color characters as a visual anchor: [Character Design References](https://www.characterdesignreferences.com/art-of-animation-6/how-persona-5-transforms-generic-menus-into-exciting-ui-moments)
-2. Controlled study on Bionic Reading found no overall statistically significant improvement in speed, accuracy, or comprehension: [Applied Sciences 2025](https://www.mdpi.com/2673-8392/5/3/124)
-3. Study on specialized dyslexia fonts reports font choice alone is not a universal fix: [Dyslexia and Fonts (2018)](https://journals.sagepub.com/doi/10.1177/0022219418771660)
+```bash
+python3 -m http.server 8000
+```
 
-## GitHub Pages
-
-This repository is static and ready for GitHub Pages from `main` branch root.
-
-If Pages is already enabled, the site should publish automatically after push.
+Then visit `http://localhost:8000`.
