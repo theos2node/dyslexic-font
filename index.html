@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mother Focus Font</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <section class="panel control-panel">
+        <p class="kicker">Dyslexic Contrast Experiment</p>
+        <h1>Mother Focus Nameplate</h1>
+        <p class="lead">
+          Type text below. The renderer inverts the first letter of each word segment
+          (including after hyphens), matching your screenshot pattern:
+          <code>Gentle-Looking Mother → G, L, M</code>.
+        </p>
+
+        <label for="inputText">Text</label>
+        <textarea id="inputText" rows="5" spellcheck="false">Gentle-Looking Mother</textarea>
+
+        <div class="controls-row">
+          <label class="checkbox">
+            <input id="lockToTitleCase" type="checkbox" checked />
+            <span>Auto title case</span>
+          </label>
+          <button id="copyBtn" type="button">Copy plain text</button>
+        </div>
+      </section>
+
+      <section class="panel preview-panel">
+        <p class="kicker">Live Preview</p>
+        <div class="stage" aria-live="polite">
+          <div class="nameplate-shell">
+            <div class="nameplate" id="nameplateOutput"></div>
+          </div>
+        </div>
+        <p class="note">
+          Note: the original in-game font is proprietary, so this uses an open serif substitute
+          plus a one-to-one highlight rule.
+        </p>
+      </section>
+    </main>
+
+    <script src="./script.js" defer></script>
+  </body>
+</html>
