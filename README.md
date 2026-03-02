@@ -21,8 +21,7 @@ This project provides a large writing area and a live rendered preview. The prev
 
 1. `Syllable Change` (default)
 - Uses approximate syllable boundaries derived from vowel groups and consonant clusters.
-- Highlights syllable-transition letters.
-- For longer words, highlights multiple transitions.
+- Highlights one syllable-transition letter per word.
 
 2. `Adaptive`
 - Uses visual-anchor heuristics tuned for quick scanning.

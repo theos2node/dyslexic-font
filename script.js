@@ -187,18 +187,29 @@ function syllableStarts(chars) {
   return [...new Set(starts)].filter((start) => start >= 0);
 }
 
-function pickSyllableBoundaryAnchors(chars) {
+function pickSyllableBoundaryAnchor(chars) {
   const starts = syllableStarts(chars).filter((start) => start > 0);
   if (starts.length === 0) {
-    return [];
+    return -1;
   }
 
-  // For longer words, highlight multiple syllable starts.
-  if (chars.length >= 10 || starts.length >= 2) {
-    return starts;
+  if (starts.length === 1) {
+    return starts[0];
   }
 
-  return [starts[0]];
+  const target = Math.round(chars.length * 0.58);
+  let best = starts[0];
+  let bestScore = Math.abs(best - target);
+
+  for (let i = 1; i < starts.length; i += 1) {
+    const score = Math.abs(starts[i] - target);
+    if (score < bestScore) {
+      best = starts[i];
+      bestScore = score;
+    }
+  }
+
+  return best;
 }
 
 function pickAdaptivePrimary(chars) {
@@ -266,7 +277,10 @@ function anchorsForWord(word, mode) {
   }
 
   if (mode === "syllable") {
-    pickSyllableBoundaryAnchors(chars).forEach((idx) => anchors.add(idx));
+    const boundary = pickSyllableBoundaryAnchor(chars);
+    if (boundary >= 0) {
+      anchors.add(boundary);
+    }
     return anchors;
   }
 
@@ -318,6 +332,10 @@ function renderNameplate() {
   let text = inputText.value;
   if (lockToTitleCase.checked) {
     text = toTitleCase(text);
+  }
+
+  if (!text.trim()) {
+    text = "Gentle-Looking Mother";
   }
 
   const selectedMode = modeSelect.value;
