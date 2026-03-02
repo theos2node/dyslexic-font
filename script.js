@@ -3,6 +3,7 @@ const lockToTitleCase = document.getElementById("lockToTitleCase");
 const modeSelect = document.getElementById("modeSelect");
 const output = document.getElementById("nameplateOutput");
 const copyBtn = document.getElementById("copyBtn");
+const printBtn = document.getElementById("printBtn");
 const editorStats = document.getElementById("editorStats");
 
 const WORD_CHAR = /[\p{L}\p{N}]/u;
@@ -335,7 +336,7 @@ function renderNameplate() {
   }
 
   if (!text.trim()) {
-    text = "Gentle-Looking Mother";
+    text = "What a pleasant surprise to read";
   }
 
   const selectedMode = modeSelect.value;
@@ -376,6 +377,10 @@ copyBtn.addEventListener("click", async () => {
       copyBtn.textContent = "Copy plain text";
     }, 1000);
   }
+});
+
+printBtn.addEventListener("click", () => {
+  window.print();
 });
 
 renderNameplate();

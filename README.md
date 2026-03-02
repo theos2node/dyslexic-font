@@ -14,6 +14,7 @@ This project provides a large writing area and a live rendered preview. The prev
 - Unlimited paragraph input
 - Live rendering while typing
 - Word and character counters
+- One-click print output (prints only the specialized rendered text)
 - Copy plain text button
 - Responsive layout for desktop and mobile
 
