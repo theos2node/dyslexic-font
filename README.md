@@ -30,6 +30,7 @@ This matches your provided screenshot behavior (`Gentle-Looking Mother` -> `G`, 
 1. Uses classic segment starts as baseline.
 2. For digraph-led words (`sh`, `ch`, `th`, etc.), anchors can shift to the first vowel after the digraph.
 3. For longer words, adds a second anchor around the middle-right of the word (consonant-biased).
+4. Includes learned overrides from your examples (for instance `shoujo`, `tutorial`, `women with camera`, `unreliable station attendant`, `aggressive reporter` patterns).
 
 ## Research notes
 
