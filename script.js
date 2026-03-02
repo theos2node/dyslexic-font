@@ -1,9 +1,13 @@
 const inputText = document.getElementById("inputText");
 const lockToTitleCase = document.getElementById("lockToTitleCase");
+const modeSelect = document.getElementById("modeSelect");
 const output = document.getElementById("nameplateOutput");
 const copyBtn = document.getElementById("copyBtn");
 
 const WORD_CHAR = /[\p{L}\p{N}]/u;
+const LETTER = /\p{L}/u;
+const VOWEL = /[aeiouy]/i;
+const DIGRAPH_PREFIXES = ["sh", "ch", "th", "ph", "wh", "qu", "gh", "kh", "ts"];
 
 function toTitleCase(value) {
   return value.replace(/[\p{L}\p{N}]+/gu, (token) => {
@@ -14,25 +18,105 @@ function toTitleCase(value) {
   });
 }
 
-function shouldInvert(chars, index) {
-  if (!WORD_CHAR.test(chars[index])) {
-    return false;
+function firstLetterIndex(chars) {
+  for (let i = 0; i < chars.length; i += 1) {
+    if (LETTER.test(chars[i])) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+function firstVowelIndex(chars, startAt = 0) {
+  for (let i = startAt; i < chars.length; i += 1) {
+    if (LETTER.test(chars[i]) && VOWEL.test(chars[i])) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+function pickPrimaryIndex(chars, mode) {
+  const base = firstLetterIndex(chars);
+  if (base < 0 || mode !== "adaptive") {
+    return base;
   }
 
-  if (index === 0) {
-    return true;
+  const lower = chars.join("").toLowerCase();
+  const digraph = DIGRAPH_PREFIXES.find((prefix) => lower.startsWith(prefix));
+  if (!digraph || chars.length < 5) {
+    return base;
   }
 
-  let prev = index - 1;
-  while (prev >= 0 && /\s/u.test(chars[prev])) {
-    prev -= 1;
+  const vowel = firstVowelIndex(chars, digraph.length);
+  return vowel >= 0 ? vowel : base;
+}
+
+function pickSecondaryIndex(chars, primaryIndex, mode) {
+  if (mode !== "adaptive" || chars.length < 8 || primaryIndex < 0) {
+    return -1;
   }
 
-  if (prev < 0) {
-    return true;
+  const target = Math.round(chars.length * 0.55);
+  let bestIndex = -1;
+  let bestScore = Number.POSITIVE_INFINITY;
+
+  for (let i = primaryIndex + 2; i < chars.length - 1; i += 1) {
+    if (!LETTER.test(chars[i])) {
+      continue;
+    }
+
+    const score = Math.abs(i - target) + (VOWEL.test(chars[i]) ? 0.9 : 0);
+    if (score < bestScore) {
+      bestScore = score;
+      bestIndex = i;
+    }
   }
 
-  return chars[prev] === "-" || /\s/u.test(chars[prev]);
+  return bestIndex;
+}
+
+function anchorsForWord(word, mode) {
+  const chars = [...word];
+  const anchors = new Set();
+
+  const primary = pickPrimaryIndex(chars, mode);
+  if (primary >= 0) {
+    anchors.add(primary);
+  }
+
+  const secondary = pickSecondaryIndex(chars, primary, mode);
+  if (secondary >= 0) {
+    anchors.add(secondary);
+  }
+
+  return anchors;
+}
+
+function collectInvertedIndexes(text, mode) {
+  const chars = [...text];
+  const inverted = new Set();
+
+  let i = 0;
+  while (i < chars.length) {
+    if (!WORD_CHAR.test(chars[i])) {
+      i += 1;
+      continue;
+    }
+
+    const start = i;
+    while (i < chars.length && WORD_CHAR.test(chars[i])) {
+      i += 1;
+    }
+
+    const word = chars.slice(start, i).join("");
+    const localAnchors = anchorsForWord(word, mode);
+    localAnchors.forEach((localIndex) => {
+      inverted.add(start + localIndex);
+    });
+  }
+
+  return { chars, inverted };
 }
 
 function renderNameplate() {
@@ -45,13 +129,14 @@ function renderNameplate() {
     text = "Gentle-Looking Mother";
   }
 
-  output.innerHTML = "";
-  const chars = [...text];
+  const mode = modeSelect.value === "classic" ? "classic" : "adaptive";
+  const { chars, inverted } = collectInvertedIndexes(text, mode);
 
+  output.innerHTML = "";
   chars.forEach((char, index) => {
     const span = document.createElement("span");
     span.className = "char";
-    if (shouldInvert(chars, index)) {
+    if (inverted.has(index)) {
       span.classList.add("inverse");
     }
     span.textContent = char;
@@ -61,6 +146,7 @@ function renderNameplate() {
 
 inputText.addEventListener("input", renderNameplate);
 lockToTitleCase.addEventListener("change", renderNameplate);
+modeSelect.addEventListener("change", renderNameplate);
 
 copyBtn.addEventListener("click", async () => {
   try {

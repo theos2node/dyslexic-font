@@ -18,15 +18,23 @@
         <p class="kicker">Dyslexic Contrast Experiment</p>
         <h1>Mother Focus Nameplate</h1>
         <p class="lead">
-          Type text below. The renderer inverts the first letter of each word segment
-          (including after hyphens), matching your screenshot pattern:
-          <code>Gentle-Looking Mother → G, L, M</code>.
+          Paste single words or full paragraphs. `Adaptive` mode uses a stronger anchor heuristic
+          for readability (for example: <code>tutorial</code> often gives <code>T + R</code>,
+          <code>shoujo</code> can anchor on <code>O</code>), while `Classic` keeps first-letter
+          anchors by segment.
         </p>
 
         <label for="inputText">Text</label>
         <textarea id="inputText" rows="5" spellcheck="false">Gentle-Looking Mother</textarea>
 
         <div class="controls-row">
+          <label class="compact-control" for="modeSelect">
+            <span>Mode</span>
+            <select id="modeSelect">
+              <option value="adaptive" selected>Adaptive</option>
+              <option value="classic">Classic</option>
+            </select>
+          </label>
           <label class="checkbox">
             <input id="lockToTitleCase" type="checkbox" checked />
             <span>Auto title case</span>

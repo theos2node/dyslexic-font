@@ -4,8 +4,10 @@ A lightweight GitHub Pages app that recreates the Persona-style speaker tag effe
 
 - White nameplate with bold black border.
 - Serif text.
-- Black-background/white-text letter blocks on segment starts.
-- Segment rule: first letter after a space or hyphen (for example: `Gentle-Looking Mother` -> `G`, `L`, `M`).
+- Black-background/white-text letter blocks.
+- Two modes:
+  - `Classic`: first letter after segment boundaries.
+  - `Adaptive`: heuristic anchors for easier scanning (for example, `tutorial` can produce `T` + `R`, and digraph-led words like `shoujo` can anchor on `O`).
 
 ## What was implemented
 
@@ -13,15 +15,21 @@ A lightweight GitHub Pages app that recreates the Persona-style speaker tag effe
 - `styles.css`: nameplate visual treatment and responsive layout.
 - `script.js`: text transform and rendering logic.
 
-## Placement rule used
+## Placement rules
 
-For each alphanumeric segment:
+`Classic` mode:
 
 1. Invert the first letter at string start.
 2. Invert the first letter after a space.
 3. Invert the first letter after `-`.
 
-This matches your provided screenshot behavior.
+This matches your provided screenshot behavior (`Gentle-Looking Mother` -> `G`, `L`, `M`).
+
+`Adaptive` mode:
+
+1. Uses classic segment starts as baseline.
+2. For digraph-led words (`sh`, `ch`, `th`, etc.), anchors can shift to the first vowel after the digraph.
+3. For longer words, adds a second anchor around the middle-right of the word (consonant-biased).
 
 ## Research notes
 

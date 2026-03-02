@@ -85,6 +85,7 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 0.8rem;
 }
 
@@ -103,6 +104,22 @@ button {
   border-radius: 8px;
   padding: 0.5rem 0.8rem;
   cursor: pointer;
+}
+
+select {
+  font: inherit;
+  color: var(--paper);
+  background: #0e0f12;
+  border: 1px solid rgba(244, 243, 237, 0.35);
+  border-radius: 8px;
+  padding: 0.42rem 0.6rem;
+}
+
+.compact-control {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
 }
 
 button:hover {
@@ -131,21 +148,19 @@ button:hover {
 
 .nameplate {
   position: relative;
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: wrap;
-  row-gap: 0.2em;
-  max-width: min(100%, 550px);
+  display: inline-block;
+  max-width: min(100%, 650px);
   padding: 0.35em 0.55em 0.38em;
   border: 10px solid #22282e;
   background: #f3f2ec;
   color: var(--ink);
   font-family: "Cormorant Garamond", Georgia, serif;
   font-weight: 700;
-  font-size: clamp(2rem, 4.1vw, 3.55rem);
-  line-height: 0.97;
+  font-size: clamp(1.35rem, 2.5vw, 2.5rem);
+  line-height: 1.03;
   letter-spacing: 0.012em;
-  text-wrap: balance;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .nameplate::after {
