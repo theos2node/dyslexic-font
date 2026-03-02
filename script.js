@@ -7,19 +7,36 @@ const copyBtn = document.getElementById("copyBtn");
 const WORD_CHAR = /[\p{L}\p{N}]/u;
 const LETTER = /\p{L}/u;
 const VOWEL = /[aeiouy]/i;
+const CORE_VOWEL = /[aeiou]/i;
 const DIGRAPH_PREFIXES = ["sh", "ch", "th", "ph", "wh", "qu", "gh", "kh", "ts"];
-const WORD_OVERRIDES = {
-  shoujo: [2],
-  tutorial: [0, 4],
-  women: [0],
-  with: [0],
-  camera: [4],
-  unreliable: [1, 9],
-  station: [],
-  attendant: [],
-  aggressive: [0, 5],
-  reporter: [3],
-};
+const ONSET_CLUSTERS = new Set([
+  "bl",
+  "br",
+  "ch",
+  "cl",
+  "cr",
+  "dr",
+  "fl",
+  "fr",
+  "gl",
+  "gr",
+  "pl",
+  "pr",
+  "sc",
+  "sh",
+  "sk",
+  "sl",
+  "sm",
+  "sn",
+  "sp",
+  "st",
+  "sw",
+  "th",
+  "tr",
+  "tw",
+  "wh",
+  "wr",
+]);
 
 function toTitleCase(value) {
   return value.replace(/[\p{L}\p{N}]+/gu, (token) => {
@@ -48,38 +65,163 @@ function firstVowelIndex(chars, startAt = 0) {
   return -1;
 }
 
-function pickPrimaryIndex(chars, mode) {
+function isVowelAt(chars, index) {
+  const current = chars[index];
+  if (!current || !LETTER.test(current)) {
+    return false;
+  }
+
+  const lower = current.toLowerCase();
+  if (CORE_VOWEL.test(lower)) {
+    return true;
+  }
+
+  if (lower !== "y") {
+    return false;
+  }
+
+  if (index === 0 || index === chars.length - 1) {
+    return false;
+  }
+
+  const prev = chars[index - 1]?.toLowerCase() ?? "";
+  return !CORE_VOWEL.test(prev);
+}
+
+function collectVowelGroups(chars) {
+  const groups = [];
+  let i = 0;
+
+  while (i < chars.length) {
+    if (!isVowelAt(chars, i)) {
+      i += 1;
+      continue;
+    }
+
+    const start = i;
+    i += 1;
+    while (i < chars.length && isVowelAt(chars, i)) {
+      i += 1;
+    }
+
+    groups.push({ start, end: i - 1 });
+  }
+
+  return groups;
+}
+
+function trimSilentTerminalE(chars, groups) {
+  if (groups.length <= 1) {
+    return groups;
+  }
+
+  const last = groups[groups.length - 1];
+  const lastChar = chars[chars.length - 1]?.toLowerCase();
+  const prevChar = chars[chars.length - 2]?.toLowerCase();
+
+  if (
+    chars.length > 3 &&
+    lastChar === "e" &&
+    last.start === chars.length - 1 &&
+    prevChar &&
+    !CORE_VOWEL.test(prevChar)
+  ) {
+    return groups.slice(0, -1);
+  }
+
+  return groups;
+}
+
+function pickStartFromConsonantGap(chars, gapStart, gapEnd) {
+  const count = gapEnd - gapStart + 1;
+  if (count <= 0) {
+    return gapEnd + 1;
+  }
+
+  if (count === 1) {
+    return gapStart;
+  }
+
+  const cluster = chars
+    .slice(gapStart, gapEnd + 1)
+    .join("")
+    .toLowerCase();
+
+  if (count === 2) {
+    return ONSET_CLUSTERS.has(cluster) ? gapStart : gapEnd;
+  }
+
+  const lastTwo = cluster.slice(-2);
+  return ONSET_CLUSTERS.has(lastTwo) ? gapEnd - 1 : gapEnd;
+}
+
+function syllableStarts(chars) {
+  const first = firstLetterIndex(chars);
+  if (first < 0) {
+    return [];
+  }
+
+  let groups = collectVowelGroups(chars);
+  groups = trimSilentTerminalE(chars, groups);
+
+  if (groups.length <= 1) {
+    return [first];
+  }
+
+  const starts = [first];
+  for (let i = 1; i < groups.length; i += 1) {
+    const prev = groups[i - 1];
+    const next = groups[i];
+    const gapStart = prev.end + 1;
+    const gapEnd = next.start - 1;
+
+    if (gapStart > gapEnd) {
+      starts.push(next.start);
+      continue;
+    }
+
+    starts.push(pickStartFromConsonantGap(chars, gapStart, gapEnd));
+  }
+
+  return [...new Set(starts)].filter((start) => start >= 0);
+}
+
+function pickSyllableBoundaryAnchor(chars) {
+  const starts = syllableStarts(chars).filter((start) => start > 0);
+  if (starts.length === 0) {
+    return -1;
+  }
+
+  if (starts.length === 1) {
+    return starts[0];
+  }
+
+  const target = Math.round(chars.length * 0.58);
+  let best = starts[0];
+  let bestScore = Math.abs(best - target);
+
+  for (let i = 1; i < starts.length; i += 1) {
+    const score = Math.abs(starts[i] - target);
+    if (score < bestScore) {
+      best = starts[i];
+      bestScore = score;
+    }
+  }
+
+  return best;
+}
+
+function pickAdaptivePrimary(chars) {
   const base = firstLetterIndex(chars);
-  if (base < 0 || mode !== "adaptive") {
-    return base;
+  if (base < 0) {
+    return -1;
   }
 
   const lower = chars.join("").toLowerCase();
-  const override = WORD_OVERRIDES[lower];
-  if (override !== undefined) {
-    return override.length > 0 ? override[0] : -1;
-  }
-
   const digraph = DIGRAPH_PREFIXES.find((prefix) => lower.startsWith(prefix));
   if (!digraph || chars.length < 5) {
     if (VOWEL.test(chars[0]) && chars.length >= 6) {
       for (let i = 1; i < chars.length; i += 1) {
-        if (LETTER.test(chars[i]) && !VOWEL.test(chars[i])) {
-          return i;
-        }
-      }
-    }
-
-    if (lower.endsWith("er") && chars.length >= 7) {
-      for (let i = chars.length - 3; i >= 0; i -= 1) {
-        if (LETTER.test(chars[i]) && VOWEL.test(chars[i])) {
-          return i;
-        }
-      }
-    }
-
-    if (lower.endsWith("a") && chars.length >= 6) {
-      for (let i = chars.length - 2; i >= 0; i -= 1) {
         if (LETTER.test(chars[i]) && !VOWEL.test(chars[i])) {
           return i;
         }
@@ -93,24 +235,9 @@ function pickPrimaryIndex(chars, mode) {
   return vowel >= 0 ? vowel : base;
 }
 
-function pickSecondaryIndex(chars, primaryIndex, mode, wordLower) {
-  if (mode !== "adaptive" || chars.length < 8 || primaryIndex < 0) {
+function pickAdaptiveSecondary(chars, primaryIndex) {
+  if (chars.length < 8 || primaryIndex < 0) {
     return -1;
-  }
-
-  const override = WORD_OVERRIDES[wordLower];
-  if (override !== undefined) {
-    return override.length > 1 ? override[1] : -1;
-  }
-
-  if (
-    VOWEL.test(chars[0]) &&
-    primaryIndex > 0 &&
-    chars.length >= 9 &&
-    LETTER.test(chars[chars.length - 1]) &&
-    VOWEL.test(chars[chars.length - 1])
-  ) {
-    return chars.length - 1;
   }
 
   if (primaryIndex !== firstLetterIndex(chars)) {
@@ -138,15 +265,30 @@ function pickSecondaryIndex(chars, primaryIndex, mode, wordLower) {
 
 function anchorsForWord(word, mode) {
   const chars = [...word];
-  const wordLower = word.toLowerCase();
   const anchors = new Set();
 
-  const primary = pickPrimaryIndex(chars, mode);
+  if (mode === "classic") {
+    const first = firstLetterIndex(chars);
+    if (first >= 0) {
+      anchors.add(first);
+    }
+    return anchors;
+  }
+
+  if (mode === "syllable") {
+    const boundary = pickSyllableBoundaryAnchor(chars);
+    if (boundary >= 0) {
+      anchors.add(boundary);
+    }
+    return anchors;
+  }
+
+  const primary = pickAdaptivePrimary(chars);
   if (primary >= 0) {
     anchors.add(primary);
   }
 
-  const secondary = pickSecondaryIndex(chars, primary, mode, wordLower);
+  const secondary = pickAdaptiveSecondary(chars, primary);
   if (secondary >= 0) {
     anchors.add(secondary);
   }
@@ -190,7 +332,11 @@ function renderNameplate() {
     text = "Gentle-Looking Mother";
   }
 
-  const mode = modeSelect.value === "classic" ? "classic" : "adaptive";
+  const selectedMode = modeSelect.value;
+  const mode = ["classic", "adaptive", "syllable"].includes(selectedMode)
+    ? selectedMode
+    : "syllable";
+
   const { chars, inverted } = collectInvertedIndexes(text, mode);
 
   output.innerHTML = "";

@@ -5,9 +5,10 @@ A lightweight GitHub Pages app that recreates the Persona-style speaker tag effe
 - White nameplate with bold black border.
 - Serif text.
 - Black-background/white-text letter blocks.
-- Two modes:
+- Three modes:
+  - `Syllable Change`: highlights one detected syllable-boundary letter per word.
   - `Classic`: first letter after segment boundaries.
-  - `Adaptive`: heuristic anchors for easier scanning (for example, `tutorial` can produce `T` + `R`, and digraph-led words like `shoujo` can anchor on `O`).
+  - `Adaptive`: heuristic anchors for easier scanning.
 
 ## What was implemented
 
@@ -25,12 +26,17 @@ A lightweight GitHub Pages app that recreates the Persona-style speaker tag effe
 
 This matches your provided screenshot behavior (`Gentle-Looking Mother` -> `G`, `L`, `M`).
 
+`Syllable Change` mode:
+
+1. Splits words into approximate syllables from vowel groups and consonant clusters.
+2. Selects one syllable-transition start as the highlight anchor.
+3. Example target behavior: `TheoDore`.
+
 `Adaptive` mode:
 
 1. Uses classic segment starts as baseline.
 2. For digraph-led words (`sh`, `ch`, `th`, etc.), anchors can shift to the first vowel after the digraph.
 3. For longer words, adds a second anchor around the middle-right of the word (consonant-biased).
-4. Includes learned overrides from your examples (for instance `shoujo`, `tutorial`, `women with camera`, `unreliable station attendant`, `aggressive reporter` patterns).
 
 ## Research notes
 

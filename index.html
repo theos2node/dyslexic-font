@@ -18,10 +18,9 @@
         <p class="kicker">Dyslexic Contrast Experiment</p>
         <h1>Mother Focus Nameplate</h1>
         <p class="lead">
-          Paste single words or full paragraphs. `Adaptive` mode uses a stronger anchor heuristic
-          for readability (for example: <code>tutorial</code> often gives <code>T + R</code>,
-          <code>shoujo</code> can anchor on <code>O</code>) and learned sample overrides, while `Classic` keeps first-letter
-          anchors by segment.
+          Paste single words or full paragraphs. `Syllable Change` highlights one letter at a
+          detected syllable boundary (for example: <code>TheoDore</code>), `Adaptive` uses a visual
+          anchor heuristic, and `Classic` keeps first-letter anchors by segment.
         </p>
 
         <label for="inputText">Text</label>
@@ -31,7 +30,8 @@
           <label class="compact-control" for="modeSelect">
             <span>Mode</span>
             <select id="modeSelect">
-              <option value="adaptive" selected>Adaptive</option>
+              <option value="syllable" selected>Syllable Change</option>
+              <option value="adaptive">Adaptive</option>
               <option value="classic">Classic</option>
             </select>
           </label>
